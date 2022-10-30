@@ -5,7 +5,7 @@ public class Main {
     public static final char[] MONTHS = {'A', 'B', 'C', 'D', 'E', 'H', 'L', 'M', 'P', 'R', 'S', 'T'};
 
     public static void main(String[] args) {
-        Person person = new Person("Peter", "Santesson", "m", "0/10/1997");
+        Person person = new Person("Peter", "Santesson", "m", "12/10/1997");
         String fiscalCode = CreateFiscalCode(person);
         System.out.println("Result: " + fiscalCode);
     }
