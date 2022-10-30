@@ -1,9 +1,21 @@
 package org.example;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Objects;
+
+import org.junit.jupiter.api.function.Executable;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 class MainTest {
 
     @Test
@@ -60,4 +72,66 @@ class MainTest {
         assertThrows(IndexOutOfBoundsException.class,
                 () -> Main.GetFirstNumber("0/09/2003"));
     }
+
+    @Test
+    void testsWitPerformTestFunction() throws Throwable {
+
+        performTest(TestData.builder()
+          .message("Get first number 19")
+          .function(() -> {
+              String firstNumber = Main.GetFirstNumber("19/09/2003");
+              assertEquals("19", firstNumber);
+              log.info("Got expected value; {}", firstNumber);
+          })
+          .build());
+
+        performTest(TestData.builder()
+          .message("Missing first number")
+          .function(() -> {
+              String firstNumber = Main.GetFirstNumber("/09/2003");
+          })
+          .exceptionClass(IndexOutOfBoundsException.class)
+          .build());
+
+        performTest(TestData.builder()
+          .message("Too long first number")
+          .function(() -> {
+              String firstNumber = Main.GetFirstNumber("023/09/2003");
+          })
+          .exceptionClass(IndexOutOfBoundsException.class)
+          .build());
+
+        performTest(TestData.builder()
+          .message("Too shot first number")
+          .function(() -> {
+              String firstNumber = Main.GetFirstNumber("0/09/2003");
+          })
+          .exceptionClass(IndexOutOfBoundsException.class)
+          .build());
+
+    }
+
+
+    void performTest(TestData testData)
+      throws Throwable{
+        log.info("Performing test: {}", testData.getMessage());
+        if (testData.getExceptionClass() != null) {
+            final Exception exception = assertThrows(testData.getExceptionClass(), testData.getFunction());
+            log.info("Expected exception is thrown: {}", exception.toString());
+        } else {
+            testData.getFunction().execute();
+        }
+    }
+
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class TestData {
+        Executable function;
+        String message;
+        Class<? extends Exception> exceptionClass;
+    }
+
 }
